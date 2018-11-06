@@ -1,0 +1,12 @@
+{
+"companyName": "OmerKatzirHack",
+"productName": "com.OmerKatzirHack.HafraotKetzevVerikud",
+"dataUrl": "WebAssembly.data.unityweb",
+"wasmCodeUrl": "WebAssembly.wasm.code.unityweb",
+"wasmFrameworkUrl": "WebAssembly.wasm.framework.unityweb",
+"TOTAL_MEMORY": 268435456,
+"graphicsAPI": ["WebGL 2.0", "WebGL 1.0"],
+"webglContextAttributes": {"preserveDrawingBuffer": false},
+"splashScreenStyle": "Light",
+"backgroundColor": "#FFFFFF"
+}
