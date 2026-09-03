@@ -39,6 +39,7 @@ export class DebugPanel {
       const el = document.createElement('details'); const summary = document.createElement('summary');
       summary.textContent = label; el.append(summary); root.append(el); return el;
     };
+    check(root, 'sprites', 'Original sprites');
     check(root, 'head', 'Physical head (resets pose)');
     check(root, 'selfCollision', 'Self-collisions');
     range(root, 'force', 'Horizontal force', 0, 150, 1, ' N');

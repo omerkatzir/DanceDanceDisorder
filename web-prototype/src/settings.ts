@@ -1,4 +1,5 @@
 export interface Settings {
+  sprites: boolean;
   head: boolean; headMass: number; selfCollision: boolean;
   force: number; holdRatio: number; gravity: number; linearDamping: number;
   angularDamping: number; torsoMass: number; armMass: number; legMass: number;
@@ -8,6 +9,7 @@ export interface Settings {
   colliders: boolean; centers: boolean; anchors: boolean; constraints: boolean;
 }
 export const defaults: Settings = {
+  sprites: true,
   head: true, headMass: 1, selfCollision: true,
   force: 36, holdRatio: 1, gravity: 5, linearDamping: 0.12,
   angularDamping: 0.18, torsoMass: 1, armMass: 1, legMass: 1,

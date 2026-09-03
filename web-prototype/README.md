@@ -1,6 +1,6 @@
 # Rhythm & Dance Disorders — physics prototype
 
-Ten connected rigid bodies (nine with the head disabled), two planted feet, one input. TypeScript + Vite + Phaser 3 + Planck. No React, music, targets, scoring, artwork, particles, menus, or mobile packaging.
+Ten connected rigid bodies (nine with the head disabled), two planted feet, one input. TypeScript + Vite + Phaser 3 + Planck. Original blue Unity sprites are rendered over the physics bodies. No React, music, targets, scoring, color switching, particles, menus, or mobile packaging.
 
 ## Run locally
 
@@ -17,6 +17,10 @@ pnpm dev
 `pnpm build` type-checks and builds `dist/`; `pnpm preview` serves the production build; `pnpm test` runs deterministic physics checks. The lockfile pins installed versions. pnpm lifecycle scripts are disabled for esbuild; its platform-specific binary is installed as a dependency. 
 
 ## Play and tune
+
+**Original sprites** toggles between the imported blue artwork and debug geometry. Pressing Space or starting a pointer hold picks expression 2, 3 or 4, just like the original controller; holding/releasing does not continually change the face. Repeats are possible, as in the original. Reset/presets return to expression 2. No heart targets or color changes are implemented.
+
+The source PNGs are copied unchanged from `Assets/KidTextures` to `public/sprites/blue/`. Limb artwork preserves its aspect ratio and fits the prototype segment length, so visible outlines can differ from the simplified colliders. The head uses the original 300 pixels/unit and 0.75 scale. Sprites consume the same interpolated poses as the debug renderer; physics dimensions, forces and masses are unchanged.
 
 The physical head and self-collisions are enabled by default. Two independent checkboxes at the top of the tuning panel allow a four-way comparison. Toggling the head rebuilds/reset the pose; toggling self-collisions preserves the current pose and refilters contacts live. Directly joint-connected bodies still do not collide. The head uses the original scaled circle radius (0.80125 m), neck offset (0.641 m above the hinge), mass 1 kg and a free neck hinge. Adjust its mass under Mass distribution. Neck angle limits remain disabled even if limb limits are enabled.
 
@@ -53,6 +57,7 @@ Primary references:
 - `src/physics.ts`: world, fixed ticks, solver substeps and reset. Force is applied on every solver substep. No control path sets body transforms.
 - `src/input.ts`: the one-button state and event cleanup.
 - `src/debug.ts`: live controls and telemetry.
+- `src/presentation.ts` and `src/face.ts`: original sprite mapping and press-triggered face state.
 - `src/main.ts`: Phaser scene and debug renderer. Filled geometry consumes interpolated physical poses; this is the eventual seam for presentation exaggeration. No animation framework yet.
 - `tests/physics.ts`: stability, input response and timestep checks.
 - `UNITY_REFERENCE.md`: recovered original values and deliberate deviations.

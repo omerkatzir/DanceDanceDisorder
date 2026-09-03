@@ -4,13 +4,15 @@ export class OneButtonInput {
   private cleanup = new AbortController();
   get held() { return this.space || this.pointers.size > 0; }
   clear = () => { this.space = false; this.pointers.clear(); };
-  constructor(surface: HTMLElement) {
+  constructor(surface: HTMLElement, onPress: () => void = () => {}) {
     const signal = this.cleanup.signal;
     const editing = (target: EventTarget | null) => target instanceof HTMLElement &&
       !!target.closest('input, select, textarea, button, summary, [contenteditable="true"]');
     window.addEventListener('keydown', event => {
       if (event.code === 'Space' && !editing(event.target)) {
-        event.preventDefault(); this.space = true;
+        event.preventDefault();
+        if (!event.repeat && !this.held) onPress();
+        this.space = true;
       }
     }, { signal });
     window.addEventListener('keyup', event => {
@@ -20,6 +22,7 @@ export class OneButtonInput {
       if (event.button !== 0) return;
       surface.focus({ preventScroll: true });
       surface.setPointerCapture(event.pointerId);
+      if (!this.held) onPress();
       this.pointers.add(event.pointerId);
       event.preventDefault();
     }, { signal });

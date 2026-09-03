@@ -4,6 +4,7 @@ import { Physics } from './physics';
 import { OneButtonInput } from './input';
 import { DebugPanel } from './debug';
 import { defaults } from './settings';
+import { DancerPresentation } from './presentation';
 import './style.css';
 
 class DanceLab extends Phaser.Scene {
@@ -11,17 +12,24 @@ class DanceLab extends Phaser.Scene {
   controls!: OneButtonInput;
   panel!: DebugPanel;
   graphics!: Phaser.GameObjects.Graphics;
+  background!: Phaser.GameObjects.Graphics;
+  presentation!: DancerPresentation;
   paused = false;
   lastDebug = 0;
+  preload() { DancerPresentation.preload(this); }
   create() {
-    this.graphics = this.add.graphics();
-    this.controls = new OneButtonInput(document.querySelector('#game')!);
+    this.background = this.add.graphics().setDepth(-10);
+    this.graphics = this.add.graphics().setDepth(20);
+    this.presentation = new DancerPresentation(this);
+    this.controls = new OneButtonInput(document.querySelector('#game')!, () => {
+      if (!this.paused) this.presentation.face.press();
+    });
     this.panel = new DebugPanel(this.physicsRig.settings, () => this.physicsRig.tune(),
-      () => { this.controls.clear(); this.physicsRig.reset(); }, () => {
+      () => { this.controls.clear(); this.physicsRig.reset(); this.presentation.face.reset(); }, () => {
         this.paused = !this.paused; this.controls.clear();
         document.querySelector('#pause')!.textContent = this.paused ? 'Resume' : 'Pause';
       });
-    this.events.once('shutdown', () => this.controls.destroy());
+    this.events.once('shutdown', () => { this.controls.destroy(); this.presentation.destroy(); });
   }
   update(time: number, delta: number) {
     if (!this.graphics) return;
@@ -35,7 +43,9 @@ class DanceLab extends Phaser.Scene {
     }
   }
   draw(alpha: number) {
-    const g = this.graphics;
+    let g = this.background;
+    this.graphics.clear();
+    this.presentation.beginFrame();
     const { dancer, settings: s } = this.physicsRig;
     const w = this.scale.width, h = this.scale.height;
     // One world-space scale, independent of device size and physics timestep.
@@ -52,12 +62,15 @@ class DanceLab extends Phaser.Scene {
       const p = point({ x: side * 0.68, y: 0.18 });
       g.fillStyle(0x798771); g.fillRoundedRect(p.x - scale * 0.27, p.y, scale * 0.54, oy - p.y + 5, 3);
     }
+    g = this.graphics;
     for (const p of dancer.parts) {
       const current = p.body.getPosition();
       const x = p.previous.x + (current.x - p.previous.x) * alpha;
       const y = p.previous.y + (current.y - p.previous.y) * alpha;
       const angle = p.previous.angle + (p.body.getAngle() - p.previous.angle) * alpha;
       const pos = point({ x, y });
+      const rendered = this.presentation.draw(p, pos.x, pos.y, angle, scale, s.sprites);
+      if (!rendered) {
       g.save(); g.translateCanvas(pos.x, pos.y); g.rotateCanvas(-angle);
       const width = p.width * scale, height = p.height * scale;
       g.fillStyle(p.color, 0.92); g.fillRoundedRect(-width / 2, -height / 2, width, height, width / 2);
@@ -67,6 +80,7 @@ class DanceLab extends Phaser.Scene {
         g.lineStyle(2, 0x324527, 0.6); g.lineBetween(-width * 0.25, -height * 0.22, width * 0.25, -height * 0.22);
       }
       g.restore();
+      }
       if (s.colliders) {
         g.lineStyle(1, 0xf5fff5, 0.9);
         for (let f = p.body.getFixtureList(); f; f = f.getNext()) {
