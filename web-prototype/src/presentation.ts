@@ -43,7 +43,8 @@ export class DancerPresentation {
     const height = part.group === 'head' ? image.frame.realHeight / 300 * 0.75 : part.height;
     const ratio = height * scale / image.frame.realHeight;
     image.setScale(ratio);
-    image.setDepth(part.group === 'head' ? 4 : part.group === 'torso' ? 3 : 1);
+    const proximal = part.name.endsWith('upper arm') || part.name.endsWith('thigh');
+    image.setDepth(part.group === 'head' ? 4 : part.group === 'torso' ? 3 : proximal ? 2 : 1);
     return true;
   }
   destroy() { for (const image of this.images.values()) image.destroy(); this.images.clear(); }
