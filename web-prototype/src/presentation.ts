@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 
 import { FaceState } from './face';
+import { unityLimbs } from './unity-limbs';
 
 const files = ['Body_Blue', 'Hand_U_Blue', 'Hand_D_blue', 'R_Leg_U_Blue',
   'L_leg_D_blue', 'R_Leg_D_Blue', 'Head_1_blue', 'Head_2_blue',
@@ -40,9 +41,16 @@ export class DancerPresentation {
     // Physics segments have +local-Y toward their distal joint; the art points down.
     image.setRotation(-angle + (limb ? Math.PI : 0));
     image.setFlipX(left && !part.name.endsWith('shin'));
-    const height = part.group === 'head' ? image.frame.realHeight / 300 * 0.75 : part.height;
+    const originalScale = part.group === 'head' || part.name.endsWith('forearm') || part.name.endsWith('shin');
+    const height = originalScale ? image.frame.realHeight * unityLimbs.pixelsToWorld : part.height;
     const ratio = height * scale / image.frame.realHeight;
     image.setScale(ratio);
+    const spec = part.name.endsWith('forearm') ? unityLimbs.forearm : part.name.endsWith('shin') ? unityLimbs.shin : null;
+    if (spec) {
+      const physicalOffset = 'centerFromElbow' in spec ? spec.centerFromElbow : spec.centerFromKnee;
+      const offset = (spec.pivotY - 0.5) * height - physicalOffset;
+      image.setPosition(x - Math.sin(angle) * offset * scale, y - Math.cos(angle) * offset * scale);
+    }
     const proximal = part.name.endsWith('upper arm') || part.name.endsWith('thigh');
     image.setDepth(part.group === 'head' ? 4 : part.group === 'torso' ? 3 : proximal ? 2 : 1);
     return true;

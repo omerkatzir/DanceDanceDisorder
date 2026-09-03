@@ -69,3 +69,7 @@ Kept upward gravity +5, free hinges, equal default segment masses, two planted f
 Changes are deliberate: simpler centered capsules, thinner debug limbs, optional self-collision (enabled by default; connected pairs excluded), floor collision, symmetric world-horizontal default control, modest default damping, render interpolation, and ≥240 Hz solver substeps. No position/rotation assignments steer the dancer. Reset explicitly reconstructs it. A zero-speed friction motor is available only as a tuning option and defaults to zero.
 
 The web preset is called **Unity-inspired**, not an exact reproduction. The original allowed non-adjacent self-collisions, now also enabled by default in the web rig. Head and self-collision toggles can recreate the first web prototype for comparison. The first goal is a stable, expressive rig that can be tuned quickly by playing.
+
+## Distal limb restoration
+
+Forearms and shins now use the original collider dimensions and joint-to-center offsets, scaled by 0.75. Forearm capsule: 0.445 × 1.675 m, center 0.61975 m beyond elbow. Shin capsule: 0.4725 × 1.765 m, center 0.67070 m below knee. Knee-to-foot vertical distance: 1.44429 m; foot x offsets: left −0.14736 m, right +0.11173 m. The original sprite pivots (.87 forearm, .88 shin) and pixel scale are restored in presentation. The simplified proximal limbs remain; this is not a full Unity rig conversion. Initial shins are upright and the upper assembly is raised to keep the floor anchors planted.

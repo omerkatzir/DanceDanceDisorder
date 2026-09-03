@@ -34,7 +34,7 @@ simulate('High force / low solver', { ...defaults, force: 150, holdRatio: 3, hz:
 
 simulate('Head, no self-collision', { ...defaults, selfCollision: false });
 simulate('No head, self-collision', { ...defaults, head: false });
-simulate('Original web rig', { ...defaults, head: false, selfCollision: false });
+simulate('No head or self-collision', { ...defaults, head: false, selfCollision: false });
 
 // Identical input boundaries at multiple rendering rates must produce the same physical result.
 function atRate(fps: number) {
@@ -74,3 +74,22 @@ assert.equal(toggle.dancer.hinges.find(h => h.kind === 'neck')!.joint.isLimitEna
 toggle.settings.head = false; toggle.tune(); assert.equal(toggle.dancer.parts.length, 9);
 toggle.settings.head = true; toggle.tune(); assert.equal(toggle.dancer.parts.length, 10);
 console.log('PASS: head geometry/mass, free neck, live collision filtering, head toggle.');
+
+// Regression against recovered Unity world-space dimensions and joint offsets.
+const restored = new Physics({ ...defaults });
+for (const side of ['L', 'R']) {
+  const arm = restored.dancer.parts.find(p => p.name === `${side} forearm`)!;
+  const shin = restored.dancer.parts.find(p => p.name === `${side} shin`)!;
+  assert(Math.abs(arm.height - 1.675) < 1e-5);
+  assert(Math.abs(arm.width - 0.445) < 1e-5);
+  assert(Math.abs(shin.height - 1.765) < 1e-5);
+  assert(Math.abs(shin.width - 0.4725) < 1e-5);
+  const elbow = restored.dancer.hinges.find(h => h.kind === 'arm' && h.joint.getBodyB() === arm.body)!.joint;
+  assert(Math.abs(arm.body.getLocalPoint(elbow.getAnchorB()).y + 0.619750366) < 1e-5);
+  const knee = restored.dancer.hinges.find(h => h.kind === 'leg' && h.joint.getBodyB() === shin.body)!.joint.getAnchorB();
+  const foot = restored.dancer.hinges.find(h => h.kind === 'foot' && h.joint.getBodyB() === shin.body)!.joint.getAnchorB();
+  assert(Math.abs(knee.y - foot.y - 1.444288283) < 1e-5);
+  assert(Math.abs(foot.x - knee.x - (side === 'L' ? -0.14735673 : 0.111732502)) < 1e-5);
+  assert(Math.abs(foot.y - 0.18) < 1e-8);
+}
+console.log('PASS: recovered Unity forearm/shin dimensions, elbow offset and asymmetric foot anchors.');

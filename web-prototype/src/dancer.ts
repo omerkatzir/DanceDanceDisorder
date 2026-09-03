@@ -1,5 +1,6 @@
 import { World, Vec2, Box, Circle, RevoluteJoint, type Body } from 'planck';
 import type { Settings } from './settings';
+import { unityLimbs } from './unity-limbs';
 
 export interface Pose { x: number; y: number; angle: number }
 export interface Part { name: string; body: Body; width: number; height: number;
@@ -18,30 +19,41 @@ export class Dancer {
   constructor(public world: World, settings: Settings) {
     const ground = world.createBody();
     ground.createFixture(Box(20, 0.15, Vec2(0, -0.15)), { friction: 0.4 });
-    this.torso = this.part('Torso', 'torso', 0, 3.15, 1.25, 1.69, 0, 0xc9f36b);
+    const shinSpec = unityLimbs.shin;
+    const kneeY = 0.18 + shinSpec.footFromKneeY;
+    const lift = kneeY - 1.46;
+    this.torso = this.part('Torso', 'torso', 0, 3.15 + lift, 1.25, 1.69, 0, 0xc9f36b);
     for (const side of [-1, 1]) {
       const prefix = side < 0 ? 'L' : 'R';
       const color = side < 0 ? 0xa897ff : 0xff9d77;
-      const hip = Vec2(side * 0.30, 2.40);
-      const knee = Vec2(side * 0.58, 1.46);
       const foot = Vec2(side * 0.68, 0.18);
+      const footOffsetX = side < 0 ? shinSpec.leftFootFromKneeX : shinSpec.rightFootFromKneeX;
+      const knee = Vec2(foot.x - footOffsetX, kneeY);
+      const hip = Vec2(side * 0.30, 2.40 + lift);
       const thigh = this.segment(`${prefix} thigh`, 'leg', hip, knee, 0.36, color);
-      const shin = this.segment(`${prefix} shin`, 'leg', knee, foot, 0.28, color);
+      const shin = this.part(`${prefix} shin`, 'leg', knee.x, knee.y - shinSpec.centerFromKnee,
+        shinSpec.width, shinSpec.height, -Math.PI, color);
       this.hinge(this.torso.body, thigh.body, hip, 'leg');
       this.hinge(thigh.body, shin.body, knee, 'leg');
       this.hinge(ground, shin.body, foot, 'foot');
-      const shoulder = Vec2(side * 0.59, 3.60);
-      const elbow = Vec2(side * 1.43, 3.91);
-      const hand = Vec2(side * 2.50, 4.02);
+      const shoulder = Vec2(side * 0.59, 3.60 + lift);
+      const elbow = Vec2(side * 1.43, 3.91 + lift);
+      const hand = Vec2(side * 2.50, 4.02 + lift);
       const upper = this.segment(`${prefix} upper arm`, 'arm', shoulder, elbow, 0.32, color);
-      const lower = this.segment(`${prefix} forearm`, 'arm', elbow, hand, 0.25, color);
+      const direction = Vec2.sub(hand, elbow);
+      direction.normalize();
+      const arm = unityLimbs.forearm;
+      const lower = this.part(`${prefix} forearm`, 'arm',
+        elbow.x + direction.x * arm.centerFromElbow,
+        elbow.y + direction.y * arm.centerFromElbow,
+        arm.width, arm.height, Math.atan2(direction.y, direction.x) - Math.PI / 2, color);
       this.hinge(this.torso.body, upper.body, shoulder, 'arm');
       this.hinge(upper.body, lower.body, elbow, 'arm');
     }
     if (settings.head) {
       // Unity local radius/offset/neck anchor, scaled by the original torso's .75.
       const radius = 1.068333387 * 0.75;
-      const neck = Vec2(0, 3.15 + 1.2 * 0.75);
+      const neck = Vec2(0, 3.15 + lift + 1.2 * 0.75);
       const head = this.part('Head', 'head', 0, neck.y + 0.85466671 * 0.75,
         radius * 2, radius * 2, 0, 0xc9f36b);
       this.hinge(this.torso.body, head.body, neck, 'neck');
