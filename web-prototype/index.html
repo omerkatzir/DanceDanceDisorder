@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#141819"/><meta name="description" content="A one-button physics dancer. Hold, release, and tune the wobble."/>
+<title>Rhythm & Dance Disorders · Physics Lab</title></head>
+<body><main>
+  <header><div><span class="eyebrow">PHYSICS LAB / 001</span><h1>Rhythm & Dance Disorders</h1></div><span class="prototype">PLAYABLE PROTOTYPE</span></header>
+  <div class="workspace">
+    <section class="play-column" aria-label="Dancer prototype">
+      <div class="stage-top"><span><i class="live-dot"></i> LIVE SIMULATION</span><span id="fps">— FPS</span></div>
+      <div id="game" tabindex="0" role="application" aria-label="Dancer. Hold Space or touch here to pull left; release to pull right."></div>
+      <div class="control-readout"><span id="input-state">RELEASED <b>→</b></span><span><kbd>SPACE</kbd> or hold the play area</span><span class="direction-help">Hold ← &nbsp; Release →</span></div>
+      <div class="telemetry" id="telemetry"></div>
+      <p class="hint">Let it lean. Catch the swing. Make it worse.</p>
+    </section>
+    <aside aria-label="Runtime physics tuning"><div class="panel-heading"><h2>Tune the wobble</h2><span>LIVE</span></div>
+      <div class="presets" id="presets" aria-label="Physics presets"></div>
+      <div id="tuning"></div>
+      <div class="actions"><button id="reset">Reset pose</button><button id="pause">Pause</button></div>
+      <p class="panel-note">Changes apply immediately. Positive gravity lifts the dancer, just like the Unity original. Presets reset the pose.</p>
+    </aside>
+  </div>
+  <footer><span id="rig-count">10 bodies · 11 hinges · 1 button</span><span>Phaser + Planck / No music. Just physics.</span></footer>
+</main><script type="module" src="/src/main.ts"></script></body></html>
