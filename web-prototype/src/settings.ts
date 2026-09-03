@@ -1,6 +1,6 @@
 export interface Settings {
   sprites: boolean;
-  head: boolean; headMass: number; selfCollision: boolean;
+  head: boolean; headMass: number; selfCollision: boolean; legCollision: boolean;
   force: number; holdRatio: number; gravity: number; linearDamping: number;
   angularDamping: number; torsoMass: number; armMass: number; legMass: number;
   limits: boolean; armLimit: number; legLimit: number; jointFriction: number;
@@ -10,7 +10,7 @@ export interface Settings {
 }
 export const defaults: Settings = {
   sprites: true,
-  head: true, headMass: 1, selfCollision: true,
+  head: true, headMass: 1, selfCollision: true, legCollision: true,
   force: 36, holdRatio: 1, gravity: 5, linearDamping: 0.12,
   angularDamping: 0.18, torsoMass: 1, armMass: 1, legMass: 1,
   limits: false, armLimit: 150, legLimit: 100, jointFriction: 0,

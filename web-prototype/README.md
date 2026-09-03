@@ -18,6 +18,8 @@ pnpm dev
 
 ## Play and tune
 
+**Leg-to-leg collisions** is an independent live experiment, enabled by default. Disable it while the knees are wedged to allow only opposite-leg parts to pass through one another. Collisions with the floor, torso, arms and head remain. Re-enabling restores normal contact resolution (overlapping limbs may separate). No pose reset, extra force or joint motor is added. This switch is disabled in the UI when all self-collisions are off. Presets restore it to enabled.
+
 **Original sprites** toggles between the imported blue artwork and debug geometry. Pressing Space or starting a pointer hold picks expression 2, 3 or 4, just like the original controller; holding/releasing does not continually change the face. Repeats are possible, as in the original. Reset/presets return to expression 2. No heart targets or color changes are implemented.
 
 The source PNGs are copied unchanged from `Assets/KidTextures` to `public/sprites/blue/`. Upper arm/thigh artwork preserves aspect ratio and fits prototype segment lengths. Forearms and shins use recovered Unity dimensions, collider offsets, sprite pivots and 300 pixels/unit at 0.75 scale. Their full sprite heights are 1.675 m and 1.765 m. Feet retain their floor anchors; the torso is raised to accommodate the longer shins. The shin artwork includes a wider shoe than its capsule collider, as in Unity. The head uses the original 300 pixels/unit and 0.75 scale. Sprites consume the same interpolated poses as the debug renderer; physics dimensions, forces and masses are unchanged.

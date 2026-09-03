@@ -7,7 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "node --import tsx tests/physics.ts && node --import tsx tests/presentation.ts"
+    "test": "node --import tsx tests/physics.ts && node --import tsx tests/presentation.ts && node --import tsx tests/leg-collisions.ts"
   },
   "dependencies": {
     "phaser": "^3.90.0",

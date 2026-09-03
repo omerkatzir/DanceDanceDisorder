@@ -98,10 +98,15 @@ export class Dancer {
       const ratio = mass / p.body.getMass();
       for (let f = p.body.getFixtureList(); f; f = f.getNext()) {
         f.setDensity(f.getDensity() * ratio);
-        // Group zero restores normal filtering; connected bodies remain excluded
-        // by collideConnected:false. setFilterGroupIndex refilters existing contacts.
+        // Distinct leg categories let opposite legs overlap while retaining
+        // their contacts with torso, arms, head and floor. Refilter live.
+        const category = p.group === 'leg' ? (p.name.startsWith('L ') ? 2 : 4) : 1;
+        const opposite = category === 2 ? 4 : category === 4 ? 2 : 0;
         const group = s.selfCollision ? 0 : -1;
-        if (f.getFilterGroupIndex() !== group) f.setFilterGroupIndex(group);
+        const mask = s.legCollision ? 0xffff : 0xffff & ~opposite;
+        if (f.getFilterGroupIndex() !== group || f.getFilterCategoryBits() !== category || f.getFilterMaskBits() !== mask) {
+          f.setFilterData({ groupIndex: group, categoryBits: category, maskBits: mask });
+        }
       }
       p.body.resetMassData();
       p.body.setLinearDamping(s.linearDamping);

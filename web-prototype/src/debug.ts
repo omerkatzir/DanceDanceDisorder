@@ -6,6 +6,7 @@ export class DebugPanel {
     const presetRoot = document.querySelector('#presets')!;
     const changed = () => {
       presetRoot.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      this.refreshers.forEach(refresh => refresh());
       onChange();
     };
     for (const [name, values] of Object.entries(presets)) {
@@ -31,7 +32,7 @@ export class DebugPanel {
     const check = (parent: HTMLElement, key: keyof Settings, label: string) => {
       const row = document.createElement('label'); row.className = 'check-row';
       const input = document.createElement('input'); input.type = 'checkbox'; input.id = String(key);
-      const refresh = () => { input.checked = Boolean(s[key]); };
+      const refresh = () => { input.checked = Boolean(s[key]); if (key === 'legCollision') input.disabled = !s.selfCollision; };
       input.onchange = () => { (s[key] as boolean) = input.checked; changed(); };
       row.append(input, label); parent.append(row); this.refreshers.push(refresh); refresh();
     };
@@ -42,6 +43,11 @@ export class DebugPanel {
     check(root, 'sprites', 'Original sprites');
     check(root, 'head', 'Physical head (resets pose)');
     check(root, 'selfCollision', 'Self-collisions');
+    check(root, 'legCollision', 'Leg-to-leg collisions');
+    const legNote = document.createElement('p');
+    legNote.className = 'panel-note';
+    legNote.textContent = 'Uncheck to let left and right legs cross. Changes live, without resetting the pose.';
+    root.append(legNote);
     range(root, 'force', 'Horizontal force', 0, 150, 1, ' N');
     range(root, 'gravity', 'Gravity · + up / − down', -10, 12, 0.25);
     range(root, 'angularDamping', 'Angular damping', 0, 3, 0.05);
